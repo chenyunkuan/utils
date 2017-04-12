@@ -1,5 +1,7 @@
 package cn.ykchen.enums;
 
+import cn.ykchen.utils.enums.EnumDescAndCode;
+
 /**
  * Created by kuange on 2017/4/12.
  */

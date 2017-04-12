@@ -1,4 +1,4 @@
-package cn.ykchen.enums;
+package cn.ykchen.utils.enums;
 
 /**
  * Created by kuange on 2017/4/12.

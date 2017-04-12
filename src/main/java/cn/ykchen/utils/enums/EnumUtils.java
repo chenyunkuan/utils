@@ -1,4 +1,4 @@
-package cn.ykchen.enums;
+package cn.ykchen.utils.enums;
 
 import java.security.InvalidParameterException;
 

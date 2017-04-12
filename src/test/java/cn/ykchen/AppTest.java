@@ -1,7 +1,7 @@
 package cn.ykchen;
 
 import cn.ykchen.enums.BooleanType;
-import cn.ykchen.enums.EnumUtils;
+import cn.ykchen.utils.enums.EnumUtils;
 
 /**
  * Unit test for simple App.
