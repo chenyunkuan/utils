@@ -3,6 +3,7 @@
  */
 package cn.ykchen.utils.excel;
 
+import cn.ykchen.utils.excel.annotation.ExcelField;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -28,9 +29,9 @@ import java.util.List;
  * @author ThinkGem
  * @version 2013-03-10
  */
-public class ImportExcel {
+public class ExcelImport {
 	
-	private static Logger log = LoggerFactory.getLogger(ImportExcel.class);
+	private static Logger log = LoggerFactory.getLogger(ExcelImport.class);
 			
 	/**
 	 * 工作薄对象
@@ -49,52 +50,39 @@ public class ImportExcel {
 	
 	/**
 	 * 构造函数
-	 * @param path 导入文件，读取第一个工作表
+	 * @param fileName 导入文件，读取第一个工作表
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(String fileName, int headerNum) 
+	public ExcelImport(String fileName, int headerNum)
 			throws InvalidFormatException, IOException {
 		this(new File(fileName), headerNum);
 	}
 	
 	/**
 	 * 构造函数
-	 * @param path 导入文件对象，读取第一个工作表
+	 * @param file 导入文件对象，读取第一个工作表
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(File file, int headerNum) 
+	public ExcelImport(File file, int headerNum)
 			throws InvalidFormatException, IOException {
 		this(file, headerNum, 0);
 	}
 
 	/**
 	 * 构造函数
-	 * @param path 导入文件
+	 * @param fileName 导入文件
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(String fileName, int headerNum, int sheetIndex) 
+	public ExcelImport(String fileName, int headerNum, int sheetIndex)
 			throws InvalidFormatException, IOException {
 		this(new File(fileName), headerNum, sheetIndex);
-	}
-	
-	/**
-	 * 构造函数
-	 * @param path 导入文件对象
-	 * @param headerNum 标题行号，数据行号=标题行号+1
-	 * @param sheetIndex 工作表编号
-	 * @throws InvalidFormatException 
-	 * @throws IOException 
-	 */
-	public ImportExcel(File file, int headerNum, int sheetIndex) 
-			throws InvalidFormatException, IOException {
-		this(file.getName(), new FileInputStream(file), headerNum, sheetIndex);
 	}
 	
 	/**
@@ -105,20 +93,33 @@ public class ImportExcel {
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(MultipartFile multipartFile, int headerNum, int sheetIndex) 
+	public ExcelImport(File file, int headerNum, int sheetIndex)
+			throws InvalidFormatException, IOException {
+		this(file.getName(), new FileInputStream(file), headerNum, sheetIndex);
+	}
+	
+	/**
+	 * 构造函数
+	 * @param multipartFile 导入文件对象
+	 * @param headerNum 标题行号，数据行号=标题行号+1
+	 * @param sheetIndex 工作表编号
+	 * @throws InvalidFormatException 
+	 * @throws IOException 
+	 *//*
+	public ExcelImport(MultipartFile multipartFile, int headerNum, int sheetIndex)
 			throws InvalidFormatException, IOException {
 		this(multipartFile.getOriginalFilename(), multipartFile.getInputStream(), headerNum, sheetIndex);
-	}
+	}*/
 
 	/**
 	 * 构造函数
-	 * @param path 导入文件对象
+	 * @param fileName 导入文件对象
 	 * @param headerNum 标题行号，数据行号=标题行号+1
 	 * @param sheetIndex 工作表编号
 	 * @throws InvalidFormatException 
 	 * @throws IOException 
 	 */
-	public ImportExcel(String fileName, InputStream is, int headerNum, int sheetIndex) 
+	public ExcelImport(String fileName, InputStream is, int headerNum, int sheetIndex)
 			throws InvalidFormatException, IOException {
 		if (StringUtils.isBlank(fileName)){
 			throw new RuntimeException("导入文档为空!");
@@ -274,10 +275,10 @@ public class ImportExcel {
 				if (val != null){
 					ExcelField ef = (ExcelField)os[0];
 					// If is dict type, get dict value
-					if (StringUtils.isNotBlank(ef.dictType())){
+					/*if (StringUtils.isNotBlank(ef.dictType())){
 						val = DictUtils.getDictValue(val.toString(), ef.dictType(), "");
 						//log.debug("Dictionary type value: ["+i+","+colunm+"] " + val);
-					}
+					}*/
 					// Get param type and type cast
 					Class<?> valType = Class.class;
 					if (os[1] instanceof Field){
@@ -323,13 +324,15 @@ public class ImportExcel {
 					}
 					// set entity value
 					if (os[1] instanceof Field){
-						Reflections.invokeSetter(e, ((Field)os[1]).getName(), val);
+						//todo
+//						Reflections.invokeSetter(e, ((Field)os[1]).getName(), val);
 					}else if (os[1] instanceof Method){
 						String mthodName = ((Method)os[1]).getName();
 						if ("get".equals(mthodName.substring(0, 3))){
 							mthodName = "set"+StringUtils.substringAfter(mthodName, "get");
 						}
-						Reflections.invokeMethod(e, mthodName, new Class[] {valType}, new Object[] {val});
+						//todo
+//						Reflections.invokeMethod(e, mthodName, new Class[] {valType}, new Object[] {val});
 					}
 				}
 				sb.append(val+", ");
@@ -345,7 +348,7 @@ public class ImportExcel {
 //	 */
 //	public static void main(String[] args) throws Throwable {
 //		
-//		ImportExcel ei = new ImportExcel("target/export.xlsx", 1);
+//		ExcelImport ei = new ExcelImport("target/export.xlsx", 1);
 //		
 //		for (int i = ei.getDataRowNum(); i < ei.getLastDataRowNum(); i++) {
 //			Row row = ei.getRow(i);

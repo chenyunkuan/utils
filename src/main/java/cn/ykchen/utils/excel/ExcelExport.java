@@ -3,31 +3,10 @@
  */
 package cn.ykchen.utils.excel;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
 import cn.ykchen.utils.excel.annotation.ExcelField;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
@@ -35,20 +14,22 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.thinkgem.jeesite.common.utils.Encodes;
-import com.thinkgem.jeesite.common.utils.Reflections;
-import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * 导出Excel文件（导出“XLSX”格式，支持大数据量导出   @see org.apache.poi.ss.SpreadsheetVersion）
  * @author ThinkGem
  * @version 2013-04-21
  */
-public class ExportExcel {
+public class ExcelExport {
 	
-	private static Logger log = LoggerFactory.getLogger(ExportExcel.class);
+	private static Logger log = LoggerFactory.getLogger(ExcelExport.class);
 			
 	/**
 	 * 工作薄对象
@@ -80,7 +61,7 @@ public class ExportExcel {
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param cls 实体对象，通过annotation.ExportField获取标题
 	 */
-	public ExportExcel(String title, Class<?> cls){
+	public ExcelExport(String title, Class<?> cls){
 		this(title, cls, 1);
 	}
 	
@@ -91,7 +72,7 @@ public class ExportExcel {
 	 * @param type 导出类型（1:导出数据；2：导出模板）
 	 * @param groups 导入分组
 	 */
-	public ExportExcel(String title, Class<?> cls, int type, int... groups){
+	public ExcelExport(String title, Class<?> cls, int type, int... groups){
 		// Get annotation field 
 		Field[] fs = cls.getDeclaredFields();
 		for (Field f : fs){
@@ -168,7 +149,7 @@ public class ExportExcel {
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param headers 表头数组
 	 */
-	public ExportExcel(String title, String[] headers) {
+	public ExcelExport(String title, String[] headers) {
 		initialize(title, Lists.newArrayList(headers));
 	}
 	
@@ -177,7 +158,7 @@ public class ExportExcel {
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param headerList 表头列表
 	 */
-	public ExportExcel(String title, List<String> headerList) {
+	public ExcelExport(String title, List<String> headerList) {
 		initialize(title, headerList);
 	}
 	
@@ -374,7 +355,7 @@ public class ExportExcel {
 	 * 添加数据（通过annotation.ExportField添加数据）
 	 * @return list 数据列表
 	 */
-	public <E> ExportExcel setDataList(List<E> list){
+	public <E> ExcelExport setDataList(List<E> list){
 		for (E e : list){
 			int colunm = 0;
 			Row row = this.addRow();
@@ -385,18 +366,18 @@ public class ExportExcel {
 				// Get entity value
 				try{
 					if (StringUtils.isNotBlank(ef.value())){
-						val = Reflections.invokeGetter(e, ef.value());
+//						val = Reflections.invokeGetter(e, ef.value());
 					}else{
 						if (os[1] instanceof Field){
-							val = Reflections.invokeGetter(e, ((Field)os[1]).getName());
+//							val = Reflections.invokeGetter(e, ((Field)os[1]).getName());
 						}else if (os[1] instanceof Method){
-							val = Reflections.invokeMethod(e, ((Method)os[1]).getName(), new Class[] {}, new Object[] {});
+//							val = Reflections.invokeMethod(e, ((Method)os[1]).getName(), new Class[] {}, new Object[] {});
 						}
 					}
 					// If is dict, get dict label
-					if (StringUtils.isNotBlank(ef.dictType())){
-						val = DictUtils.getDictLabel(val==null?"":val.toString(), ef.dictType(), "");
-					}
+//					if (StringUtils.isNotBlank(ef.dictType())){
+//						val = DictUtils.getDictLabel(val==null?"":val.toString(), ef.dictType(), "");
+//					}
 				}catch(Exception ex) {
 					// Failure to ignore
 					log.info(ex.toString());
@@ -414,7 +395,7 @@ public class ExportExcel {
 	 * 输出数据流
 	 * @param os 输出数据流
 	 */
-	public ExportExcel write(OutputStream os) throws IOException{
+	public ExcelExport write(OutputStream os) throws IOException{
 		wb.write(os);
 		return this;
 	}
@@ -423,19 +404,19 @@ public class ExportExcel {
 	 * 输出到客户端
 	 * @param fileName 输出文件名
 	 */
-	public ExportExcel write(HttpServletResponse response, String fileName) throws IOException{
+	/*public ExcelExport write(HttpServletResponse response, String fileName) throws IOException{
 		response.reset();
         response.setContentType("application/octet-stream; charset=utf-8");
         response.setHeader("Content-Disposition", "attachment; filename="+Encodes.urlEncode(fileName));
 		write(response.getOutputStream());
 		return this;
-	}
-	
+	}*/
+
 	/**
 	 * 输出到文件
-	 * @param fileName 输出文件名
+	 * @param name 输出文件名
 	 */
-	public ExportExcel writeFile(String name) throws FileNotFoundException, IOException{
+	public ExcelExport writeFile(String name) throws FileNotFoundException, IOException{
 		FileOutputStream os = new FileOutputStream(name);
 		this.write(os);
 		return this;
@@ -444,7 +425,7 @@ public class ExportExcel {
 	/**
 	 * 清理临时文件
 	 */
-	public ExportExcel dispose(){
+	public ExcelExport dispose(){
 		wb.dispose();
 		return this;
 	}
@@ -469,7 +450,7 @@ public class ExportExcel {
 //			dataList.add(dataRowList);
 //		}
 //
-//		ExportExcel ee = new ExportExcel("表格标题", headerList);
+//		ExcelExport ee = new ExcelExport("表格标题", headerList);
 //		
 //		for (int i = 0; i < dataList.size(); i++) {
 //			Row row = ee.addRow();
