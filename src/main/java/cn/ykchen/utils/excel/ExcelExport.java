@@ -371,9 +371,12 @@ public class ExcelExport {
 //						val = Reflections.invokeGetter(e, ef.value());
 					}else{
 						if (os[1] instanceof Field){
-//							val = Reflections.invokeGetter(e, ((Field)os[1]).getName());
+							Field field = (Field)os[1];
+							field.setAccessible(true);
+							val = field.get(e);
 						}else if (os[1] instanceof Method){
-//							val = Reflections.invokeMethod(e, ((Method)os[1]).getName(), new Class[] {}, new Object[] {});
+							Method method = (Method)os[1];
+							val = method.invoke(e);
 						}
 					}
 					// If is dict, get dict label
