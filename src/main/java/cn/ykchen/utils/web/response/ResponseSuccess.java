@@ -5,15 +5,15 @@ package cn.ykchen.utils.web.response;
  */
 public class ResponseSuccess<T> extends ResponseVO<T> {
 
-    private static final String SCCESS_MSG = "成功";
+    private static final String SUCCESS_MSG = "成功";
 
-    private static final int SCCESS_CODE = 1;
+    private static final int SUCCESS_CODE = 1;
 
     public ResponseSuccess() {
-        super(SCCESS_CODE, SCCESS_MSG, null);
+        super(SUCCESS_CODE, SUCCESS_MSG, null);
     }
 
     public ResponseSuccess(T body) {
-        super(SCCESS_CODE, SCCESS_MSG, body);
+        super(SUCCESS_CODE, SUCCESS_MSG, body);
     }
 }
